@@ -12,3 +12,15 @@ function randomFloat(min, max) {
 function randomInt(min, max) {
     return floor(random() * (max - min) + min)
 }
+
+/**
+ * Determines if one number is within range of another, given a tolerance
+ * @param {*} alpha (number 1)
+ * @param {*} beta  (number 2)
+ * @param {*} tolerance
+ * @returns boolean
+ */
+function rangeOf(alpha, beta, tolerance) {
+    let difference = abs(alpha - beta);
+    return difference < tolerance;
+}

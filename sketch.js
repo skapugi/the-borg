@@ -4,6 +4,8 @@ const canvasHeight = window.innerHeight;
 var foodX;
 var foodY;
 
+var defeated = false;
+
 /* Sets the board up */
 function setup() {
     createCanvas(canvasWidth, canvasHeight);
@@ -11,6 +13,7 @@ function setup() {
     makeBorg(canvasWidth/2, canvasHeight/2);
     foodX = 100;
     foodY = 100;
+    defeated = false;
 }
 
 /**
@@ -18,15 +21,19 @@ function setup() {
  */
 function draw() { 
 
-    frameRate(60);
+    /* Reset the game if the player loses */
+    if(defeated) {
+        window.alert("Game Over! Score: " + borgCubes.length);
+        setup();
+    }    
+
+    frameRate(15);
 
     clear();
     background(000);
     starsDraw();
 
-    let xdiff = abs(borgX - foodX);
-    let ydiff = abs(borgY - foodY);
-    if(xdiff < 20 && ydiff < 20) {
+    if( rangeOf(borgX, foodX, 20) && rangeOf(borgY, foodY, 20) ) {
         placeFood(true);
         borgCubes.push([borgX, borgY]);
     }

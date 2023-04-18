@@ -2,13 +2,16 @@ var borgX;
 var borgY;
 var borgCubes = [];
 
-var borgSpeed = 5;
-var borgVelX = 0;
-var borgVelY = 0;
+var borgSpeed = 30;
+var borgVelX;
+var borgVelY;
 
 function makeBorg(xInput, yInput) {
     borgX = xInput;
     borgY = yInput;
+    borgVelX = 0;
+    borgVelY = 0;
+    borgCubes.length = 0;
 }
 
 /**
@@ -20,8 +23,10 @@ function drawBorg() {
 
     /* Moves position of each borg cube part up by 1 index */
     for(let i = borgCubes.length - 1; i > 0; i--) {
+        // borgCubes[i-1][0] -= (25 * borgVelX);
+        // borgCubes[i-1][1] -= (25 * borgVelY);
         borgCubes[i] = borgCubes[i-1];
-        console.log(borgCubes[i]);
+        //if( rangeOf(borgX, borgCubes[i][0], 20) && rangeOf(borgY, borgCubes[i][1], 20)) defeated = true;
     }
     borgCubes[0] = [borgX, borgY];
 
@@ -29,12 +34,8 @@ function drawBorg() {
     borgX += (borgSpeed * borgVelX);
     borgY += (borgSpeed * borgVelY);
 
-    /* Inverts the Borg's velocity when it reaches the edge of the screen. Eventually, will end the game. */
-    if(borgX > canvasWidth) borgVelX = -1;
-    else if (borgX < 0) borgVelX = 1;
-    
-    if(borgY > canvasHeight) borgVelY = -1;
-    else if (borgY < 0) borgVelY = 1;
+    /* Ends the game if the player hits the edge of the screen */
+    if( (borgX > canvasWidth) || (borgX < 0) || (borgY > canvasHeight) || (borgY < 0) ) defeated = true;
 
     /* Draws borg cube head and body */
     rect(borgX, borgY, 25, 25);
