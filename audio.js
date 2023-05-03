@@ -1,5 +1,5 @@
 /* Plays the First Contact theme while playing the game */
-const audioTheme = new Audio('audio/theme/firstContact.m4a');
+const audioTheme = new Audio('audio/theme/firstContact.mp3');
 audioTheme.oncanplay = function() {
     audioTheme.volume = 0.2;
     audioTheme.loop = true;

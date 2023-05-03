@@ -1,6 +1,6 @@
 const squareSize = 40;
-const boardSizeWidth = 20;
-const boardSizeHeight = 20;
+const boardSizeWidth = window.innerHeight/1000 * 20;
+const boardSizeHeight = window.innerHeight/1000 * 20;
 
 const colourBorg = "#054907";
 const colourEnemy = "gray";
