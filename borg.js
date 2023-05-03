@@ -1,58 +1,114 @@
+const squareSize = 40;
+const boardSizeWidth = 20;
+const boardSizeHeight = 20;
+
+const colourBorg = "#054907";
+const colourEnemy = "gray";
+
+var defeated = false;
+
+var borgAsim = [];
 var borgX;
 var borgY;
-var borgCubes = [];
-
-var borgSpeed = 30;
 var borgVelX;
 var borgVelY;
 
-function makeBorg(xInput, yInput) {
-    borgX = xInput;
-    borgY = yInput;
+var enemyX;
+var enemyY;
+
+/* Creates (and resets) the canvas and all variables */
+function setup() {
+    createCanvas(boardSizeWidth * squareSize, boardSizeHeight * squareSize);
+    defeated = false;
+    borgX = 12 * squareSize;
+    borgY = 12 * squareSize;
+    borgAsim = [];
     borgVelX = 0;
     borgVelY = 0;
-    borgCubes.length = 0;
+    placeEnemy();
+    starsGenerate(boardSizeWidth * squareSize, boardSizeHeight * squareSize);
 }
 
-/**
- * Draws The Borg cubes
- */
-function drawBorg() {
-    stroke('green');
-    fill('green');
+/*
+Draws Borg and enemy vessel on the canvas.
+Defeat conditions, assimilation and reset are handled within this function.
+*/
+function draw() {
 
-    /* Moves position of each borg cube part up by 1 index */
-    for(let i = borgCubes.length - 1; i > 0; i--) {
-        // borgCubes[i-1][0] -= (25 * borgVelX);
-        // borgCubes[i-1][1] -= (25 * borgVelY);
-        borgCubes[i] = borgCubes[i-1];
-        //if( rangeOf(borgX, borgCubes[i][0], 20) && rangeOf(borgY, borgCubes[i][1], 20)) defeated = true;
+    frameRate(10);
+    clear();
+    background(000);
+    starsDraw();
+
+    /* Draw Borg */
+    stroke('gray');
+    fill(colourBorg);
+    for(let i = 0; i < borgAsim.length; i++) {
+        rect(borgAsim[i][0], borgAsim[i][1], squareSize, squareSize);
     }
-    borgCubes[0] = [borgX, borgY];
+    rect(borgX, borgY, squareSize, squareSize);
 
-    /* Moves borg cube head */
-    borgX += (borgSpeed * borgVelX);
-    borgY += (borgSpeed * borgVelY);
+    /* Cause the Borg to move */
+    moveBorg();
 
-    /* Ends the game if the player hits the edge of the screen */
-    if( (borgX > canvasWidth) || (borgX < 0) || (borgY > canvasHeight) || (borgY < 0) ) defeated = true;
+    /* Defeated condition: Borg collides with itself */
+    for(let i = 0; i < borgAsim.length; i++) {
+        if(borgX == borgAsim[i][0] && borgY == borgAsim[i][1]) defeated = true;
+    }
 
-    /* Draws borg cube head and body */
-    rect(borgX, borgY, 25, 25);
-    for(let i = 1; i < borgCubes.length; i++) {
-        rect(borgCubes[i][0], borgCubes[i][1], 25, 25);
+    /* Defeated condition: Borg hits edge of canvas */
+    if(borgX > (boardSizeWidth * squareSize) - squareSize || borgX < 0) defeated = true;
+    if(borgY > (boardSizeHeight * squareSize) - squareSize || borgY < 0) defeated = true;
+
+    /* Draw enemy vessel */
+    stroke(colourEnemy);
+    fill(colourEnemy);
+    rect(enemyX, enemyY, squareSize, squareSize);
+
+    /* Assimilate some ship (snake 'eats') when the Borg head collides with it */
+    if(borgX == enemyX && borgY == enemyY) {
+        borgAsim.push([enemyX, enemyY]);
+        placeEnemy();
+        playBorgSound();
+    }
+
+    /*
+    Reset the board if the user is 'defeated'
+    Framerate is set to '1', to avoid constant pop-ups.
+    Alert and restart delayed in order to allow Borg to be drawn as colliding with itself.
+    */
+    if(defeated) {
+        frameRate(1);
+        setTimeout(()=> {
+            alert("The Borg have been defeated! Assimilated Ships: " + borgAsim.length);
+            setup();
+        },100);
     }
 
 }
 
-/**
- * Changes the velocity of the borg, i.e., the direction the borg is moving.
- * Player is prevented from moving the Borg in the opposite direction; e.g., can not move 'left' if already moving 'right'.
- * @param {*} keyInput 
- */
-function changeDirectionBorg(keyInput) {
+/* Move the Borg head and all assimilated ships */
+function moveBorg() {
 
-    switch(keyInput) {
+    for(let i = borgAsim.length-1; i > 0; i--) borgAsim[i] = borgAsim[i-1];
+    if(borgAsim.length) borgAsim[0] = [borgX, borgY];
+    borgX += squareSize * borgVelX;
+    borgY += squareSize * borgVelY;
+
+}
+
+/* Randomly place an enemy ship */
+function placeEnemy() {
+
+    enemyX = Math.floor(Math.random() * boardSizeWidth) * squareSize;
+    enemyY = Math.floor(Math.random() * boardSizeHeight) * squareSize;
+
+}
+
+/* Changes the borg's direction dependent on which arrow key the user uses */
+function keyPressed() {
+
+    switch(keyCode) {
 
         case LEFT_ARROW:
             if(borgVelX === 1) return;
@@ -68,14 +124,14 @@ function changeDirectionBorg(keyInput) {
 
         case UP_ARROW:
             if(borgVelY === 1) return;
-            borgVelY = -1;
             borgVelX = 0;
+            borgVelY = -1;
             break;
-        
+
         case DOWN_ARROW:
             if(borgVelY === -1) return;
-            borgVelY = 1;
             borgVelX = 0;
+            borgVelY = 1;
             break;
 
     }

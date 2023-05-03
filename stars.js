@@ -3,11 +3,11 @@ var stars = [];
 /**
  * Generates the positions of the 'stars', stored in stars[].
  */
-function starsGenerate() {
+function starsGenerate(width, height) {
     
     for(let i = 0; i < 512; i++) {
-        let x = randomInt(0, canvasWidth);
-        let y = randomInt(0, canvasHeight);
+        let x = floor(random() * width)
+        let y = floor(random() * height)
         stars.push([x, y]);
     }
 
@@ -20,4 +20,3 @@ function starsDraw() {
     stroke('white');
     for(let i = 0; i < 512; i++) point(stars[i][0], stars[i][1])
 }
-
